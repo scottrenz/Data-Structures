@@ -86,6 +86,7 @@ class LRUCache:
                     # let while know that it was found
                     notfound = False
         else:
+            # key was not found in dictionary
             # see if cache is at limit
             if self.storage.length == self.limit:
                 # if at limit, remove oldest entry
@@ -94,6 +95,3 @@ class LRUCache:
             # not in dictionary, so add it
             self.dict[key] = value
             self.storage.add_to_tail(key)
-
-
-
