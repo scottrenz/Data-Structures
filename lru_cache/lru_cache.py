@@ -29,16 +29,12 @@ class LRUCache:
         else:
             vs = self.storage.tail
             # start off finding the key in cache by seeing if it is at tail
-            if self.storage.tail.value == key:
+            if vs.value == key:
                 # if it is already at the tail, noting needs to be moved
                 return val
             notfound = True    
             while notfound:
                 vs = vs.prev
-                if vs is None:
-                    # print('is none',vs)
-                    return
-                # print('line vs = vs.prev',vs)
                 # keep going through the storage until it is found
                 if vs.value == key:
                     # when found, move it to the end of storage
@@ -72,7 +68,7 @@ class LRUCache:
         if vd != None:
             # it is in cache
             notfound = True
-            # initial an indicator as to if place found in cache yet
+            # initial an indicator to show if place found in cache yet
             self.dict[key] = value
             # set the item in the dictionary to the new value
             vs = self.storage.tail
@@ -82,7 +78,6 @@ class LRUCache:
                 return
             while notfound:
                 vs = vs.prev
-
                 # keep going through the storage until it is found
                 if vs.value == key:
                     # when found, move it to the end of storage
@@ -94,6 +89,7 @@ class LRUCache:
             # see if cache is at limit
             if self.storage.length == self.limit:
                 # if at limit, remove oldest entry
+                del self.dict[self.storage.head.value]
                 self.storage.remove_from_head()
             # not in dictionary, so add it
             self.dict[key] = value
