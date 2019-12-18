@@ -70,7 +70,7 @@ class LRUCache:
             vs = self.storage.tail
             # start off finding the key in cache by seeing if it is at tail
             if vs.value == key:
-                # if it is already at the tail, noting needs to be moved
+                # if it is already at the tail, nothing needs to be moved
                 return
             while True:
                 vs = vs.prev
