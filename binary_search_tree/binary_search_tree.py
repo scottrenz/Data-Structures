@@ -12,12 +12,28 @@ class BinarySearchTree:
 
     # Insert the given value into the tree
     def insert(self, value):
-        pass
+        if self.contains(value):
+            return
+        if value < self.value:
+            current_next = self.right
+            if current_next is None:
+                self.right = ListNode(value, self, current_next)
+            else:
+                self.insert(value)    
+        else:
+            current_next = self.left
+            if current_next is None:
+                self.left = ListNode(value, self, current_next)
+            else:
+                self.insert(value)    
+
 
     # Return True if the tree contains the value
     # False if it does not
     def contains(self, target):
-        pass
+        if self.value == target:
+            return True
+
 
     # Return the maximum value found in the tree
     def get_max(self):
