@@ -1,3 +1,6 @@
+import sys
+from doubly_linked_list import DoublyLinkedList
+
 class LRUCache:
     """
     Our LRUCache class keeps track of the max number of nodes it
@@ -7,7 +10,10 @@ class LRUCache:
     to every node stored in the cache.
     """
     def __init__(self, limit=10):
-        pass
+        self.limit = limit
+        self.dict = {}
+        self.storage = DoublyLinkedList()
+
 
     """
     Retrieves the value associated with the given key. Also
@@ -17,7 +23,30 @@ class LRUCache:
     key-value pair doesn't exist in the cache.
     """
     def get(self, key):
-        pass
+        val = self.dict.get(key)
+        if val is None:
+            return
+        else:
+            vs = self.storage.tail
+            # start off finding the key in cache by seeing if it is at tail
+            if self.storage.tail.value == key:
+                # if it is already at the tail, noting needs to be moved
+                return val
+            notfound = True    
+            while notfound:
+                vs = vs.prev
+                if vs is None:
+                    # print('is none',vs)
+                    return
+                # print('line vs = vs.prev',vs)
+                # keep going through the storage until it is found
+                if vs.value == key:
+                    # when found, move it to the end of storage
+                    # so it will be first one checked at next request
+                    self.storage.move_to_end(vs)
+                    # let while know that it was found
+                    notfound = False
+        return val
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -30,4 +59,45 @@ class LRUCache:
     the newly-specified value.
     """
     def set(self, key, value):
-        pass
+        # see if anything in cache
+        if self.storage.head is None:
+            # if nothing in cache, put item in cache
+            self.storage.add_to_tail(key)
+            self.dict[key] = value
+            return
+        # at least one item is in cache
+        # see if item coming in is already in cache    
+        vd = self.dict.get(key)
+        # if vd got a value, the key is already in cache
+        if vd != None:
+            # it is in cache
+            notfound = True
+            # initial an indicator as to if place found in cache yet
+            self.dict[key] = value
+            # set the item in the dictionary to the new value
+            vs = self.storage.tail
+            # start off finding the key in cache by seeing if it is at tail
+            if vs.value == key:
+                # if it is already at the tail, noting needs to be moved
+                return
+            while notfound:
+                vs = vs.prev
+
+                # keep going through the storage until it is found
+                if vs.value == key:
+                    # when found, move it to the end of storage
+                    # so it will be first one checked at next request
+                    self.storage.move_to_end(vs)
+                    # let while know that it was found
+                    notfound = False
+        else:
+            # see if cache is at limit
+            if self.storage.length == self.limit:
+                # if at limit, remove oldest entry
+                self.storage.remove_from_head()
+            # not in dictionary, so add it
+            self.dict[key] = value
+            self.storage.add_to_tail(key)
+
+
+
