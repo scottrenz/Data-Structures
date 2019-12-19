@@ -23,24 +23,12 @@ class LRUCache:
     key-value pair doesn't exist in the cache.
     """
     def get(self, key):
-        val = self.dict.get(key)
-        if val is None:
+        node = self.dict.get(key)
+        if node is None:
             return
         else:
-            vs = self.storage.tail
-            # start off finding the key in cache by seeing if it is at tail
-            if vs.value == key:
-                # if it is already at the tail, noting needs to be moved
-                return val
-            while True:
-                vs = vs.prev
-                # keep going through the storage until it is found
-                if vs.value == key:
-                    # when found, move it to the end of storage
-                    # so it will be first one checked at next request
-                    self.storage.move_to_end(vs)
-                    # let while know that it was found
-                    return val
+            self.storage.move_to_end(node)
+            return node.value[1]
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -53,41 +41,13 @@ class LRUCache:
     the newly-specified value.
     """
     def set(self, key, value):
-        # see if anything in cache
-        if self.storage.head is None:
-            # if nothing in cache, put item in cache
-            self.storage.add_to_tail(key)
-            self.dict[key] = value
+        if key in self.dict:
+            node = self.dict[key]
+            node.value = (key, value)
+            self.storage.move_to_end(node)
             return
-        # at least one item is in cache
-        # see if item coming in is already in cache    
-        vd = self.dict.get(key)
-        # if vd got a value, the key is already in cache
-        if vd != None:
-            # it is in cache
-            self.dict[key] = value
-            # set the item in the dictionary to the new value
-            vs = self.storage.tail
-            # start off finding the key in cache by seeing if it is at tail
-            if vs.value == key:
-                # if it is already at the tail, nothing needs to be moved
-                return
-            while True:
-                vs = vs.prev
-                # keep going through the storage until it is found
-                if vs.value == key:
-                    # when found, move it to the end of storage
-                    # so it will be first one checked at next request
-                    self.storage.move_to_end(vs)
-                    # let while know that it was found
-                    return
-        else:
-            # key was not found in dictionary
-            # see if cache is at limit
-            if self.storage.length == self.limit:
-                # if at limit, remove oldest entry
-                del self.dict[self.storage.head.value]
-                self.storage.remove_from_head()
-            # not in dictionary, so add it
-            self.dict[key] = value
-            self.storage.add_to_tail(key)
+        if self.storage.length == self.limit:
+            del self.dict[self.storage.head.value[0]]
+            self.storage.remove_from_head()
+        self.storage.add_to_tail((key, value))
+        self.dict[key] = self.storage.tail
